@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" href="display.css" />
+
+        <script src="js/libopus.js"></script>
+        <script src="js/opus.js"></script>
+        <script src="js/xaudio.js"></script>
+        <script src="js/ws-audio-api.js"></script>
+    </head>
+
+    <body>
+        <button class='start' onclick="startContext();streamer.start(onStarted)">Start</button>
+        <button class='stop' onclick="streamer.stop()">Stop</button>
+
+        <br>
+
+        <br>
+        <span id='message'></span>
+        <br><br>
+
+        <select id="lang" onchange="window.changeLang();">
+            <option value="fr" selected>French</option>
+            <option value="en">English</option>
+        </select>
+
+        <div class='output'></div>
+    </body>
+
+
+    <script>
+        document.getElementById('lang').value='fr';
+        document.getElementById('lang').style.display='none';
+
+        function onStarted() {
+            document.getElementById('lang').style.display='block';
+        }
+
+        function startContext() {
+            const audioContext = new(window.AudioContext || window.webkitAudioContext)();
+            window.audioContext = audioContext;
+
+            //Initialize WebKit Audio:
+            (function() {
+                if (!launchedContext) {
+                    try {
+                        audioContextHandle = new AudioContext(); //Create a system audio context.
+                    } catch (error) {
+                        try {
+                            audioContextHandle = new AudioContext(); //Create a system audio context.
+                        } catch (error) {
+                            return;
+                        }
+                    }
+                    try {
+                        audioSource = audioContextHandle.createBufferSource(); //We need to create a false input to get the chain started.
+                        audioSource.loop = false; //Keep this alive forever (Event handler will know when to ouput.)
+                        XAudioJSSampleRate = webAudioActualSampleRate = audioContextHandle.sampleRate;
+                        audioSource.buffer = audioContextHandle.createBuffer(1, 1, webAudioActualSampleRate); //Create a zero'd input buffer for the input to be valid.
+                        audioNode = audioContextHandle.createJavaScriptNode(samplesPerCallback, 1, 2); //Create 2 outputs and ignore the input buffer (Just copy buffer 1 over if mono)
+                        audioNode.onaudioprocess = audioOutputEvent; //Connect the audio processing event to a handling function so we can manipulate output
+                        audioSource.connect(audioNode); //Send and chain the input to the audio manipulation.
+                        audioNode.connect(audioContextHandle.destination); //Send and chain the output of the audio manipulation to the system audio output.
+                        audioSource.noteOn(0); //Start the loop!
+                    } catch (error) {
+                        return;
+                    }
+                    launchedContext = true;
+                }
+            })();
+
+            let defaultConfig = {
+                codec: {
+                    sampleRate: 24000,
+                    channels: 1,
+                    app: 2048,
+                    frameDuration: 20,
+                    bufferSize: 4096
+                },
+                server: {
+                    host: 'ws://localhost:8080'
+                }
+            }
+
+            window.streamer = new WSAudioAPI.Streamer(defaultConfig);
+        }
+
+        const start = document.querySelector('.start')
+        const stop = document.querySelector('.stop')
+
+        stop.classList.add('hidden')
+
+        start.addEventListener('click', () => {
+            start.classList.add('hidden')
+
+            stop.classList.remove('hidden')
+        })
+
+        stop.addEventListener('click', () => {
+            stop.classList.add('hidden')
+            start.classList.remove('hidden')
+        })
+    </script>
+</html>
