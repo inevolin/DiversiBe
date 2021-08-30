@@ -25,9 +25,6 @@
         return String.fromCharCode(...new Uint8Array(buf));
     }
 
-
-
-
     let WSAudioAPI = global.WSAudioAPI = {
         Streamer: function(config, socket) {
             //1 : get microphone access
@@ -50,7 +47,7 @@
                 _this.socket.send(JSON.stringify({text:data}))
             }
 
-            this._makeStream = function(callback, onError) {
+            this._makeStream = function(callback_start, onError) {
                 navigator.getUserMedia({
                     audio: true
                 }, function(stream) {
@@ -69,7 +66,6 @@
                             //4 : send data over socket
                             if (_this.socket.readyState == 1) {
                                 let data = {audio:ab2str(packets[i])};
-                                // console.log(data, packets[i])
                                 _this.socket.send(JSON.stringify(data));
                             }
                         }
@@ -79,14 +75,14 @@
                     _this.gainNode.connect(_this.recorder);
                     _this.recorder.connect(audioContext.destination);
 
-                    callback();
+                    callback_start();
                 }, onError || _this.onError);
             }
         }
     };
 
 
-    WSAudioAPI.Streamer.prototype.start = function(callback, onError) {
+    WSAudioAPI.Streamer.prototype.start = function(callback_start, onError) {
         let _this = this;
         console.log(this.config)
         if (!this.parentSocket) {
@@ -98,7 +94,7 @@
         this.socket.binaryType = 'arraybuffer';
 
         if (this.socket.readyState == WebSocket.OPEN) {
-            this._makeStream(callback, onError);
+            this._makeStream(callback_start, onError);
         } else if (this.socket.readyState == WebSocket.CONNECTING) {
             let _onopen = this.socket.onopen;
 
@@ -106,7 +102,7 @@
                 if (_onopen) {
                     _onopen();
                 }
-                _this._makeStream(callback, onError);
+                _this._makeStream(callback_start, onError);
             }
         } else {
             console.error('Socket is in CLOSED state');
