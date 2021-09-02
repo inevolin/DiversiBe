@@ -2,7 +2,6 @@
 <html>
     <head>
         <link rel="stylesheet" href="display.css" />
-
         <script src="js/libopus.js"></script>
         <script src="js/opus.js"></script>
         <script src="js/xaudio.js"></script>
@@ -19,7 +18,16 @@
         <span id='message'></span>
         <br><br>
 
-        <select id="lang" onchange="window.changeLang();">
+
+        <span>transcribe from:</span>
+        <select id="lang">
+            <option value="fr" selected>French</option>
+            <option value="en">English</option>
+        </select>
+
+
+        <span>translate to:</span>
+        <select id="translang">
             <option value="fr" selected>French</option>
             <option value="en">English</option>
         </select>
@@ -29,11 +37,8 @@
 
 
     <script>
-        document.getElementById('lang').value='fr';
-        document.getElementById('lang').style.display='none';
-
         function onStarted() {
-            document.getElementById('lang').style.display='block';
+
         }
 
         function startContext() {

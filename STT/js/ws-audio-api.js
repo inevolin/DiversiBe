@@ -41,12 +41,6 @@
             this.encoder = new OpusEncoder(this.config.codec.sampleRate, this.config.codec.channels, this.config.codec.app, this.config.codec.frameDuration);
             let _this = this;
 
-
-            global.changeLang = function() {
-                let data = 'changeLang:' + document.getElementById('lang').value;
-                _this.socket.send(JSON.stringify({text:data}))
-            }
-
             this._makeStream = function(callback_start, onError) {
                 navigator.getUserMedia({
                     audio: true
@@ -65,7 +59,11 @@
                         for (let i = 0; i < packets.length; i++) {
                             //4 : send data over socket
                             if (_this.socket.readyState == 1) {
-                                let data = {audio:ab2str(packets[i])};
+                                let data = {
+                                    audio: ab2str(packets[i]),
+                                    transcribe: document.getElementById('lang').value,
+                                    translate:  document.getElementById('translang').value,
+                                };
                                 _this.socket.send(JSON.stringify(data));
                             }
                         }
@@ -126,6 +124,11 @@
             // display the message on the paragraph
             if (message) {
                 addMsg.textContent = message.data
+            }
+
+            if (message.data.includes('appointment')) {
+                // enter date in datepicker
+                // ...
             }
 
             // ajoute l element dans la page HTML

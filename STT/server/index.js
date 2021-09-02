@@ -7,6 +7,10 @@ const { OpusEncoder } = require('@discordjs/opus');
 const encoder = new OpusEncoder(24000, 1);
 const textEncoding = require('text-encoding');
 const TextDecoder = textEncoding.TextDecoder;
+const translate = require("translate"); 
+require('dotenv').config();
+translate.engine = "google";
+translate.key = process.env.GOOGLE_TRANSLATE_KEY;
 
 const wsPort = 8080;
 
@@ -21,19 +25,20 @@ const vosk = require('vosk');
 vosk.setLogLevel(-1);//?
 // MODELS: https://alphacephei.com/vosk/models
 const recs = {
-    en : new vosk.Recognizer({model: new vosk.Model('samples/vosk-model-en'), sampleRate: 24000}),
-    fr : new vosk.Recognizer({model: new vosk.Model('samples/vosk-model-fr'), sampleRate: 24000}),
+    'en' : new vosk.Recognizer({model: new vosk.Model('samples/vosk-model-en'), sampleRate: 24000}),
+    'fr' : new vosk.Recognizer({model: new vosk.Model('samples/vosk-model-fr'), sampleRate: 24000}),
 }
 
 wss.on('connection', function(ws, req) {
-    ws.active_rec = recs.fr;//depending on your active language
+    ws.transcribe_lang   = 'fr'; //depending on your active language
+    ws.translate_lang    = 'fr'; // default
     ws.on('message', function(message) {
         try {
             processMessage(ws, message)
         } catch(ex) {
-            console.error(ex);
+            // console.error(ex);
+            throw ex;
         }
-       
     });
     console.log('Speaker connected');
 });
@@ -42,8 +47,7 @@ function str2ab(str) {
   return Uint8Array.from([...str].map(ch => ch.charCodeAt()));
 }
 
-
-function processMessage(ws, message) {
+async function processMessage(ws, message) {
 
     // * JSON string to object
     message = JSON.parse(message.toString('utf8'));
@@ -54,27 +58,19 @@ function processMessage(ws, message) {
         let raw_data = encoder.decode(str2ab(message.audio));
 
         //7 : send raw audio data to VOSK API
-        if (ws.active_rec.acceptWaveform(raw_data)) {
-            const txt = ws.active_rec.result().text;
-            console.log(txt)
-            ws.send(txt);//8: output
-
-            // change & test:
-            // todo : if changed by voice then update UI box
-            if (txt == "change English") {
-                ws.active_rec = recs.en;
-            }
-            else if (txt == "change French") {
-                ws.active_rec = recs.fr;
+        if (recs[message.transcribe].acceptWaveform(raw_data)) {
+            const txt = recs[message.transcribe].result().text;
+            if (txt.trim().length === 0) return; // skip empty messages
+            // output
+            // todo...
+            if (message.transcribe !== message.translate) {
+                // ...
+            } else {
+                ws.send(txt);
             }
         }
     } else {
-        console.log(message.text)
-        if (message.text.includes('changeLang')) {
-            let idx = message.text.split(':')[1]
-            ws.active_rec = recs[idx]
-            console.log('new active rec: ', idx)
-        }
+        throw message;
     }
 }
 
