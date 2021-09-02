@@ -13,7 +13,6 @@ translate.engine = "google";
 translate.key = process.env.GOOGLE_TRANSLATE_KEY;
 
 const wsPort = 8080;
-
 const httpsServer = https.createServer({
     key: fs.readFileSync('key.pem', 'utf8'),
     cert: fs.readFileSync('cert.pem', 'utf8')
@@ -63,7 +62,7 @@ async function processMessage(ws, message) {
             if (txt.trim().length === 0) return; // skip empty messages
             // output
             // todo...
-            if (message.transcribe !== message.translate) {
+            if (translate.key && (message.transcribe !== message.translate)) {
                 // ...
             } else {
                 ws.send(txt);
