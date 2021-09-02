@@ -61,7 +61,6 @@ async function processMessage(ws, message) {
             const txt = recs[message.transcribe].result().text;
             if (txt.trim().length === 0) return; // skip empty messages
             // output
-            // todo...
             if (translate.key && (message.transcribe !== message.translate)) {
                 // ...
             } else {
