@@ -62,7 +62,8 @@ async function processMessage(ws, message) {
             if (txt.trim().length === 0) return; // skip empty messages
             // output
             if (translate.key && (message.transcribe !== message.translate)) {
-                // ...
+                // ... Sagi ...
+                ws.send(txt);
             } else {
                 ws.send(txt);
             }
