@@ -110,29 +110,11 @@
 
         //we receive the message from the server
         this.socket.onmessage = function(message) {
-            // console.log(message);
-
-            /*const output = document.querySelector('.output');
-
-            if (message) {
-                output.innerHTML = message.data;
-            }*/
-
-            // create the paragraph
             let addMsg = document.createElement('p')
-
-            // display the message on the paragraph
             if (message) {
-                addMsg.textContent = message.data
+                addMsg.textContent = message.data;
             }
-
-            if (message.data.includes('appointment')) {
-                // enter date in datepicker
-                // ...
-            }
-
-            // ajoute l element dans la page HTML
-            document.querySelector('.output').prepend(addMsg)
+            document.querySelector('.output').prepend(addMsg);
         }; 
 
         this.socket.onclose = function(event) {
