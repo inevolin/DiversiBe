@@ -111,15 +111,21 @@
         //we receive the message from the server
         this.socket.onmessage = function(message) {
             let addMsg = document.createElement('p')
-            if (message) {
-                addMsg.textContent = message.data;
-            }
+            addMsg.textContent = message.data;
             document.querySelector('.output').prepend(addMsg);
 
             // Google Search
             if (message.data.toLowerCase().includes('google')) {
                 let query = message.data.toLowerCase().split('google')[1];
                 window.open('http://google.com/search?q=' + query);
+            }
+
+            // NLP Dates
+            if (message.data.includes('appointment')) {
+                let input = message.data.split('appointment')[1].trim();
+                console.log('input:', input)
+                let out = Sherlock.parse(input);
+                console.log(out.startDate);
             }
 
         }; 
