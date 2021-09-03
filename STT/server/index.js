@@ -21,6 +21,7 @@ const httpsServer = https.createServer({
 const wss = new WebSocketServer({ server: httpsServer });
 
 const vosk = require('vosk');
+const { exit } = require('process');
 vosk.setLogLevel(-1);//?
 // MODELS: https://alphacephei.com/vosk/models
 const recs = {
