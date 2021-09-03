@@ -62,8 +62,8 @@ async function processMessage(ws, message) {
             if (txt.trim().length === 0) return; // skip empty messages
             // output
             if (translate.key && (message.transcribe !== message.translate)) {
-                // ... Sagi ...
-                ws.send(txt);
+                const translated = await translate(txt, { from: message.transcribe, to: message.translate });
+                ws.send(translated);
             } else {
                 ws.send(txt);
             }

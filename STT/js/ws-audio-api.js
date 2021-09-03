@@ -117,8 +117,8 @@
             document.querySelector('.output').prepend(addMsg);
 
             // Google Search
-            if (message.data.includes('google')) {
-                let query = message.data.split('google')[1];
+            if (message.data.toLowerCase().includes('google')) {
+                let query = message.data.toLowerCase().split('google')[1];
                 window.open('http://google.com/search?q=' + query);
             }
 
