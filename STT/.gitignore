@@ -18,3 +18,5 @@ node_modules
 vosk-model-*
 
 .env
+
+samples/
