@@ -1,0 +1,40 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+.container {
+  max-width: 400px;
+  margin: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  min-height: 80vh;
+}
+.content {
+  border: none;
+  outline: none;
+}
+
+h1 {
+  margin-top: 200px;
+}
+p{
+  margin-bottom: 300px;
+  text-align: center;
+}
+
+.record {
+   position: fixed;
+  
+}
+
+button{
+  border: none;
+  background: red;
+  color: #fff;
+  border-radius: 50%;
+  padding: 7px;
+  cursor: pointer;
+}
